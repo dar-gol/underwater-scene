@@ -103,5 +103,11 @@
     <None Include="shaders\skybox.frag">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="shaders\particles.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\particles.vert">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
