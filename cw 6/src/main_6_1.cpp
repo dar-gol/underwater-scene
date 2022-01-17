@@ -395,7 +395,7 @@ GLuint loadDDS(const char* imagepath)
 }
 
 void initParticles() {
-	particleTexture = loadDDS("textures/particles/particle.DDS");
+	particleTexture = loadDDS("textures/particles/particle_original.DDS");
 
 	g_particule_position_size_data = new GLfloat[MaxParticles * 4];
 	g_particule_color_data = new GLubyte[MaxParticles * 4];
@@ -439,17 +439,23 @@ void simulateParticles() {
 	// Generate 10 new particule each millisecond,
 	// but limit this to 16 ms (60 fps), or if you have 1 long frame (1sec),
 	// newparticles will be huge and the next frame even longer.
-	int newparticles = (int)(delta * 10000.0);
-	if (newparticles > (int)(0.016f * 10000.0))
-		newparticles = (int)(0.016f * 10000.0);
+	int newparticles = (int)(delta * 300.0);
+	if (newparticles > (int)(0.016f * 300.0))
+		newparticles = (int)(0.016f * 300.0);
 
 	for (int i = 0; i < newparticles; i++) {
 		int particleIndex = FindUnusedParticle();
 		ParticlesContainer[particleIndex].life = 5.0f; // This particle will live 5 seconds.
-		ParticlesContainer[particleIndex].pos = glm::vec3(6.0f, -4.0f, 4.0f);
 
-		float spread = 1.5f;
-		glm::vec3 maindir = glm::vec3(0.0f, 10.0f, 0.0f);
+		if (i % 2) {
+			ParticlesContainer[particleIndex].pos = glm::vec3(0.0f, -2.0f, 4.0f);
+		}
+		else {
+			ParticlesContainer[particleIndex].pos = glm::vec3(6.0f, -2.0f, -8.0f);
+		}
+
+		float spread = 1.0f;
+		glm::vec3 maindir = glm::vec3(0.0f, 1.0f, 0.0f);
 		// Very bad way to generate a random direction; 
 		// See for instance http://stackoverflow.com/questions/5408276/python-uniform-spherical-distribution instead,
 		// combined with some user-controlled parameters (main direction, spread, etc)
@@ -463,12 +469,12 @@ void simulateParticles() {
 
 
 		// Very bad way to generate a random color
-		ParticlesContainer[particleIndex].r = rand() % 256;
-		ParticlesContainer[particleIndex].g = rand() % 256;
-		ParticlesContainer[particleIndex].b = rand() % 256;
+		ParticlesContainer[particleIndex].r = 200;
+		ParticlesContainer[particleIndex].g = 200;
+		ParticlesContainer[particleIndex].b = 255;
 		ParticlesContainer[particleIndex].a = (rand() % 256) / 3;
 
-		ParticlesContainer[particleIndex].size = (rand() % 1000) / 80000.0f + 0.1f;
+		ParticlesContainer[particleIndex].size = (rand() % 1000) / 100000.0f + 0.05f;
 
 	}
 
@@ -485,7 +491,8 @@ void simulateParticles() {
 			if (p.life > 0.0f) {
 
 				// Simulate simple physics : gravity only, no collisions
-				p.speed += glm::vec3(0.0f, -9.81f, 0.0f) * (float)delta * 0.5f;
+				// decreased acceleration - bubbles were too fast
+				p.speed += glm::vec3(0.0f, 1.81f, 0.0f) * (float)delta * 0.5f;
 				p.pos += p.speed * (float)delta;
 				p.cameradistance = glm::length2(p.pos - cameraPos);
 				//ParticlesContainer[i].pos += glm::vec3(0.0f,10.0f, 0.0f) * (float)delta;
@@ -558,7 +565,7 @@ void bindParticles() {
 	glUniform3f(CameraRight_worldspace_ID, cameraSide.x, cameraSide.y, cameraSide.z);
 	glUniform3f(CameraUp_worldspace_ID, cameraVertical.x, cameraVertical.y, cameraVertical.z);
 
-	glm::mat4 transformation = perspectiveMatrix * glm::mat4(glm::mat3(cameraMatrix));
+	glm::mat4 transformation = perspectiveMatrix * cameraMatrix;
 	glUniformMatrix4fv(ViewProjMatrixID, 1, GL_FALSE, (float*)&transformation);
 
 
