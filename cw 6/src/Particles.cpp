@@ -226,11 +226,11 @@ void spawnParticles(double deltaTime, glm::vec3 sourcePosition, double amount, f
 
 	for (int i = 0; i < newparticles; i++) {
 		int particleIndex = FindUnusedParticle();
-		ParticlesContainer[particleIndex].life = 5.0f; // This particle will live 5 seconds.
+		ParticlesContainer[particleIndex].life = 20.0f; // This particle will live 5 seconds.
 
 		ParticlesContainer[particleIndex].pos = sourcePosition;
 
-		glm::vec3 maindir = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 maindir = glm::vec3(0.0f, 0.4f, 0.0f);
 		// Very bad way to generate a random direction; 
 		// See for instance http://stackoverflow.com/questions/5408276/python-uniform-spherical-distribution instead,
 		// combined with some user-controlled parameters (main direction, spread, etc)
@@ -269,7 +269,7 @@ void simulateParticles(glm::vec3 cameraPos, double deltaTime) {
 
 				// Simulate simple physics : gravity only, no collisions
 				// decreased acceleration - bubbles were too fast
-				p.speed += glm::vec3(0.0f, 1.81f, 0.0f) * (float)deltaTime * 0.5f;
+				p.speed += glm::vec3(0.0f, 1.0f, 0.0f) * (float)deltaTime * 0.5f;
 				p.pos += p.speed * (float)deltaTime;
 				p.cameradistance = glm::length2(p.pos - cameraPos);
 				//ParticlesContainer[i].pos += glm::vec3(0.0f,10.0f, 0.0f) * (float)delta;
@@ -299,7 +299,7 @@ void simulateParticles(glm::vec3 cameraPos, double deltaTime) {
 
 	SortParticles();
 
-	printf("%d ", ParticlesCount);
+	// printf("%d ", ParticlesCount);
 }
 
 void updateParticles() {

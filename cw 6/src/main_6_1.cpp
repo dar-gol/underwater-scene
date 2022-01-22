@@ -257,7 +257,7 @@ void renderScene()
 
 	drawObjectTexture(sphereContext, glm::translate(glm::vec3(0, 0, 0)), textureAsteroid);
 
-	drawObjectTexture(terrainContext, glm::translate(glm::vec3(0, -2, 0)) * glm::rotate(glm::radians(-90.0f), glm::vec3(1, 0, 0)) * glm::scale(glm::vec3(0.05f)), textureTerrain);
+	drawObjectTexture(terrainContext, glm::translate(glm::vec3(0, -2, 0)) * glm::scale(glm::vec3(1.0f)), textureTerrain);
 
 	glUseProgram(programSkybox);
 	glUniform1i(glGetUniformLocation(programSkybox, "skybox"), 0);
@@ -289,15 +289,18 @@ void init()
 
 	loadModelToContext("models/spaceship.obj", shipContext);
 	loadModelToContext("models/sphere.obj", sphereContext);
-	loadModelToContext("models/desert_terrain.obj", terrainContext);
-	textureTerrain = Core::LoadTexture("textures/desert_terrain/diffuse.png");
+	loadModelToContext("models/ocean_floor3.obj", terrainContext);
+	textureTerrain = Core::LoadTexture("textures/ocean_floor.jpg");
 	textureAsteroid = Core::LoadTexture("textures/asteroid.png");
 	cubemapTexture = loadCubemap();
 	createSkybox();
 
 	initParticles();
-	addParticleSource(glm::vec3(0, -2, 0), 300.0f, 1.0f);
-	addParticleSource(glm::vec3(4, -2, 2), 200.0f, 0.5f);
+	addParticleSource(glm::vec3(3.45, -1.9, 1.45), 120.0f, 0.6f);
+	addParticleSource(glm::vec3(-1.6, 1, 1.6), 180.0f, 0.3f);
+	addParticleSource(glm::vec3(0, -2, 0), 100.0f, 1.5f);
+	addParticleSource(glm::vec3(0, -2, -3), 100.0f, 1.5f);
+	addParticleSource(glm::vec3(2, -2, -1), 100.0f, 1.5f);
 }
 
 void shutdown()
