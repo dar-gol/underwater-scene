@@ -48,6 +48,9 @@
     <ClCompile Include="src\main_6_1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Particles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\objload.h">
@@ -81,6 +84,9 @@
       <Filter>Source Files\SOIL</Filter>
     </ClInclude>
     <ClInclude Include="src\Texture.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particles.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
