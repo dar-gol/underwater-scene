@@ -52,7 +52,7 @@ std::vector<std::string> faces = {
 	"textures/skybox/back.png",
 };
 
-float skyboxSize = 10.0f;
+float skyboxSize = 200.0f;
 float distanceToSkybox = 0.5f;
 
 float skyboxVertices[] = {
@@ -249,16 +249,6 @@ void renderScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.1f, 0.3f, 1.0f);
 
-
-
-	glm::mat4 shipInitialTransformation = glm::translate(glm::vec3(0, -0.5f, 0)) * glm::rotate(glm::radians(180.0f), glm::vec3(0, 1, 0)) * glm::scale(glm::vec3(0.25f));
-	glm::mat4 shipModelMatrix = glm::translate(cameraPos + cameraDir * 1.0f) * glm::mat4_cast(glm::inverse(rotation)) * shipInitialTransformation;
-	drawObjectColor(shipContext, shipModelMatrix, glm::vec3(0.6f));
-
-	drawObjectTexture(sphereContext, glm::translate(glm::vec3(0, 0, 0)), textureAsteroid);
-
-	drawObjectTexture(terrainContext, glm::translate(glm::vec3(0, -2, 0)) * glm::scale(glm::vec3(1.0f)), textureTerrain);
-
 	glUseProgram(programSkybox);
 	glUniform1i(glGetUniformLocation(programSkybox, "skybox"), 0);
 	glm::mat4 transformation = perspectiveMatrix * glm::mat4(glm::mat3(cameraMatrix));
@@ -269,6 +259,15 @@ void renderScene()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
+
+	glm::mat4 shipInitialTransformation = glm::translate(glm::vec3(0, -0.5f, 0)) * glm::rotate(glm::radians(180.0f), glm::vec3(0, 1, 0)) * glm::scale(glm::vec3(0.25f));
+	glm::mat4 shipModelMatrix = glm::translate(cameraPos + cameraDir * 1.0f) * glm::mat4_cast(glm::inverse(rotation)) * shipInitialTransformation;
+	drawObjectColor(shipContext, shipModelMatrix, glm::vec3(0.6f));
+
+	drawObjectTexture(sphereContext, glm::translate(glm::vec3(0, 0, 0)), textureAsteroid);
+
+	drawObjectTexture(terrainContext, glm::translate(glm::vec3(0, -2, 0)) * glm::scale(glm::vec3(1.0f)), textureTerrain);
+
 	glDepthFunc(GL_LESS); // set depth function back to default
 
 	// particles
