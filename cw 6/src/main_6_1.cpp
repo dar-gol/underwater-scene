@@ -21,7 +21,7 @@ Core::Shader_Loader shaderLoader;
 
 Core::RenderContext shipContext, terrainContext, sphereContext;
 
-glm::vec3 cameraPos = glm::vec3(0, 0, 5);
+glm::vec3 cameraPos = glm::vec3(0, 5, 5);
 glm::vec3 cameraDir; // Wektor "do przodu" kamery
 glm::vec3 cameraSide; // Wektor "w bok" kamery
 glm::vec3 cameraVertical;
@@ -52,8 +52,8 @@ std::vector<std::string> faces = {
 	"textures/skybox/back.png",
 };
 
-float skyboxSize = 200.0f;
-float distanceToSkybox = 0.5f;
+float skyboxSize = 10.0f;
+float skyboxBoundary = 15.0f;
 
 float skyboxVertices[] = {
 	-skyboxSize,  skyboxSize, -skyboxSize,
@@ -99,21 +99,31 @@ float skyboxVertices[] = {
 	 skyboxSize, -skyboxSize,  skyboxSize
 };
 
+bool isInBoundaries(glm::vec3 nextPosition) {
+	return nextPosition.z > -skyboxBoundary && nextPosition.z < skyboxBoundary 
+		&& nextPosition.y > 5.0f && nextPosition.y < skyboxBoundary
+		&& nextPosition.x < skyboxBoundary && nextPosition.x > -skyboxBoundary;
+}
+
 void keyboard(unsigned char key, int x, int y)
 {
 
 	float angleSpeed = 0.01f;
 	float moveSpeed = 0.1f;
+	glm::vec3 nextPosition;
 	switch (key)
 	{
 		case 'z': quatZ = glm::angleAxis(angleSpeed, glm::vec3(0.0, 0.0, 1.0)); break;
 		case 'x': quatZ = glm::angleAxis(-angleSpeed, glm::vec3(0.0, 0.0, 1.0)); break;
-		case 'w': cameraPos += cameraDir * moveSpeed; break;
-		case 's': cameraPos -= cameraDir * moveSpeed; break;
-		case 'd': cameraPos += cameraSide * moveSpeed; break;
-		case 'a': cameraPos -= cameraSide * moveSpeed; break;
-		case 'q': cameraPos += cameraVertical * moveSpeed; break;
-		case 'e': cameraPos -= cameraVertical * moveSpeed; break;
+		case 'w': nextPosition = cameraPos + cameraDir * moveSpeed; break;
+		case 's': nextPosition = cameraPos - cameraDir * moveSpeed; break;
+		case 'd': nextPosition = cameraPos + cameraSide * moveSpeed; break;
+		case 'a': nextPosition = cameraPos - cameraSide * moveSpeed; break;
+		case 'q': nextPosition = cameraPos + cameraVertical * moveSpeed; break;
+		case 'e': nextPosition = cameraPos - cameraVertical * moveSpeed; break;
+	}
+	if (isInBoundaries(nextPosition)) {
+		cameraPos = nextPosition;
 	}
 }
 
@@ -259,6 +269,8 @@ void renderScene()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
+
+	glClear(GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 shipInitialTransformation = glm::translate(glm::vec3(0, -0.5f, 0)) * glm::rotate(glm::radians(180.0f), glm::vec3(0, 1, 0)) * glm::scale(glm::vec3(0.25f));
 	glm::mat4 shipModelMatrix = glm::translate(cameraPos + cameraDir * 1.0f) * glm::mat4_cast(glm::inverse(rotation)) * shipInitialTransformation;
