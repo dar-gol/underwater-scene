@@ -19,18 +19,19 @@ GLuint programColor, programTexture, programSkybox, programParticles;
 
 Core::Shader_Loader shaderLoader;
 
-Core::RenderContext shipContext, terrainContext, sphereContext;
+Core::RenderContext shipContext, terrainContext, seaweedContext, fishContext, seaweed2Context, aloeContext, fish2Context;
 
 glm::vec3 cameraPos = glm::vec3(0, 5, 5);
 glm::vec3 cameraDir; // Wektor "do przodu" kamery
 glm::vec3 cameraSide; // Wektor "w bok" kamery
 glm::vec3 cameraVertical;
-float cameraAngle = 0;
 
+float cameraAngle = 0;
 float differenceX = 0.0f;
 float differenceY = 0.0f;
 float prevPosX = -1.0f;
 float prevPosY = -1.0f;
+
 glm::quat rotation = glm::quat(1, 0, 0, 0);
 glm::quat quatZ;
 
@@ -38,7 +39,7 @@ glm::mat4 cameraMatrix, perspectiveMatrix;
 
 glm::vec3 lightDir = glm::vec3(1.0f, -0.9f, -1.0f);
 
-GLuint textureAsteroid, textureTerrain;
+GLuint textureSeaweed, textureTerrain, textureFish, textureSeaweed2, textureAloe, textureFish2;
 
 unsigned int cubemapTexture; //skybox
 unsigned int skyboxVAO, skyboxVBO; //skybox
@@ -52,8 +53,96 @@ std::vector<std::string> faces = {
 	"textures/skybox/back.png",
 };
 
-float skyboxSize = 10.0f;
 float skyboxBoundary = 15.0f;
+
+float skyboxSize = 10.0f;
+
+std::vector<Core::Node> car;
+std::vector<glm::vec3> keyPoints1({
+	glm::vec3(200.0f, 2.0f, 29.0f),
+	glm::vec3(195.0f, 2.0f, 29.0f),
+	glm::vec3(190.0f, 8.0f, 29.0f),
+	glm::vec3(185.0f, 8.0f, 29.0f),
+	glm::vec3(180.0f, 8.0f, 29.0f),
+	glm::vec3(175.0f, 8.0f, 29.0f),
+	glm::vec3(170.0f, 8.0f, 29.0f),
+	glm::vec3(165.0f, 8.0f, 29.0f),
+	glm::vec3(160.0f, 8.0f, 29.0f),
+	glm::vec3(155.0f, 8.0f, 29.0f),
+	glm::vec3(150.0f, 8.0f, 29.0f),
+	glm::vec3(145.0f, 8.0f, 29.0f),
+	glm::vec3(140.0f, 8.0f, 29.0f),
+	glm::vec3(135.0f, 8.0f, 29.0f),
+	glm::vec3(130.0f, 8.0f, 29.0f),
+	glm::vec3(124.0f, 8.0f, 29.0f),
+	glm::vec3(120.0f,8.0f, 33.0f),
+	glm::vec3(115.0f, 8.0f, 33.0f),
+	glm::vec3(110.0f, 8.0f, 33.0f),
+	glm::vec3(105.0f, 8.2f, 35.0f),
+	glm::vec3(95.0f, 8.5f, 43.0f),
+	glm::vec3(85.0f, 8.5f, 43.0f),
+	glm::vec3(75.0f, 8.0f, 43.0f),
+	glm::vec3(65.0f, 8.0f, 43.0f),
+	glm::vec3(55.0f, 8.0f, 48.0f),
+	glm::vec3(45.0f, 8.0f, 37.0f),
+	glm::vec3(35.0f, 8.0f, 24.0f),
+	glm::vec3(25.0f,8.0f, 18.0f),
+	glm::vec3(15.0f, 8.0f, 4.0f),
+	glm::vec3(5.0f, 8.0f, -6.0f),
+	glm::vec3(-5.0f, 8.0f, -16.0f),
+	glm::vec3(-15.0f, 8.0f, -26.0f),
+	glm::vec3(-16.0f, 8.0f, -30.0f),
+	glm::vec3(-18.0f, 8.0f, -40.0f),
+	glm::vec3(-16.0f, 8.0f, -50.0f),
+	glm::vec3(-10.0f, 8.0f, -60.0f),
+	glm::vec3(-12.0f, 8.0f, -70.0f),
+	glm::vec3(-13.0f, 8.0f, -80.0f),
+	glm::vec3(-12.0f, 8.0f, -90.0f)
+	});
+std::vector<glm::quat> keyRotation1;
+
+std::vector<glm::vec3> keyPoints2({
+	glm::vec3(-12.0f, 20.0f, 300.0f),
+	glm::vec3(-13.0f, 19.0f, 80.0f),
+	glm::vec3(-12.0f, 18.0f, 70.0f),
+	glm::vec3(-10.0f, 17.0f, 60.0f),
+	glm::vec3(-16.0f, 16.0f, 50.0f),
+	glm::vec3(-18.0f, 15.0f, 40.0f),
+	glm::vec3(-16.0f, 14.0f, 30.0f),
+	glm::vec3(-15.0f, 13.0f, 26.0f),
+	glm::vec3(-5.0f, 8.0f, 16.0f),
+	glm::vec3(5.0f, 8.0f, 6.0f),
+	glm::vec3(15.0f, 8.0f, -4.0f),
+	glm::vec3(25.0f,8.0f, -18.0f),
+	glm::vec3(35.0f, 8.0f, -24.0f),
+	glm::vec3(45.0f, 8.0f, -37.0f),
+	glm::vec3(55.0f, 8.0f, -48.0f),
+	glm::vec3(65.0f, 8.0f, -43.0f),
+	glm::vec3(75.0f, 8.0f, -43.0f),
+	glm::vec3(85.0f, 8.5f, -43.0f),
+	glm::vec3(95.0f, 8.5f, -43.0f),
+	glm::vec3(105.0f, 8.2f, -35.0f),
+	glm::vec3(110.0f, 8.0f, -33.0f),
+	glm::vec3(115.0f, 8.0f, -33.0f),
+	glm::vec3(120.0f,8.0f, -33.0f),
+	glm::vec3(124.0f, 8.0f, -29.0f),
+	glm::vec3(130.0f, 8.0f, -29.0f),
+	glm::vec3(135.0f, 8.0f, -29.0f),
+	glm::vec3(140.0f, 8.0f, -29.0f),
+	glm::vec3(145.0f, 8.0f, -29.0f),
+	glm::vec3(150.0f, 8.0f, -29.0f),
+	glm::vec3(155.0f, 8.0f, -29.0f),
+	glm::vec3(160.0f, 8.0f, -29.0f),
+	glm::vec3(165.0f, 8.0f, -29.0f),
+	glm::vec3(170.0f, 8.0f, -29.0f),
+	glm::vec3(175.0f, 8.0f, -29.0f),
+	glm::vec3(180.0f, 8.0f, -29.0f),
+	glm::vec3(185.0f, 8.0f, -29.0f),
+	glm::vec3(190.0f, 8.0f, -29.0f),
+	glm::vec3(195.0f, 2.0f, -29.0f),
+	glm::vec3(200.0f, 2.0f, -29.0f),
+});
+std::vector<glm::quat> keyRotation2;
 
 float skyboxVertices[] = {
 	-skyboxSize,  skyboxSize, -skyboxSize,
@@ -103,6 +192,40 @@ bool isInBoundaries(glm::vec3 nextPosition) {
 	return nextPosition.z > -skyboxBoundary && nextPosition.z < skyboxBoundary 
 		&& nextPosition.y > 5.0f && nextPosition.y < skyboxBoundary
 		&& nextPosition.x < skyboxBoundary && nextPosition.x > -skyboxBoundary;
+}
+
+glm::mat4 animationMatrix(float time, std::vector<glm::vec3> keyPoints, std::vector<glm::quat> keyRotation) {
+	float speed = 2.;
+	time = time * speed;
+	std::vector<float> distances;
+	float timeStep = 0;
+	for (int i = 0; i < keyPoints.size() - 1; i++) {
+		timeStep += (keyPoints[i] - keyPoints[i + 1]).length();
+		distances.push_back((keyPoints[i] - keyPoints[i + 1]).length());
+	}
+	time = fmod(time, timeStep);
+
+	int index = 0;
+
+	while (distances[index] <= time) {
+		time = time - distances[index];
+		index += 1;
+	}
+
+	float t = time / distances[index];
+
+	int size = keyPoints.size() - 1;
+	int rotationSize = keyRotation.size() - 1;
+
+	glm::vec3 pos = glm::catmullRom(keyPoints[index - 1], keyPoints[index], keyPoints[index + 1], keyPoints[index + 2], t);
+
+	auto a1 = keyRotation[index] * glm::exp(-(glm::log(glm::inverse(keyRotation[index]) * keyRotation[index - 1]) + glm::log(glm::inverse(keyRotation[index]) * keyRotation[index + 1])) * glm::quat(1 / 4, 1 / 4, 1 / 4, 1 / 4));
+	auto a2 = keyRotation[index + 1] * glm::exp(-(glm::log(glm::inverse(keyRotation[index + 1]) * keyRotation[index]) + glm::log(glm::inverse(keyRotation[index + 1]) * keyRotation[index + 2])) * glm::quat(1 / 4, 1 / 4, 1 / 4, 1 / 4));
+	auto animationRotation = glm::squad(keyRotation[index], keyRotation[index + 1], a1, a2, t);
+
+	glm::mat4 result = glm::translate(pos) * glm::mat4_cast(animationRotation);
+
+	return result;
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -252,6 +375,7 @@ void createSkybox() {
 
 void renderScene()
 {
+	float time = glutGet(GLUT_ELAPSED_TIME) / 1000.f;
 	// Aktualizacja macierzy widoku i rzutowania
 	cameraMatrix = createCameraMatrix();
 	perspectiveMatrix = Core::createPerspectiveMatrix();
@@ -276,18 +400,91 @@ void renderScene()
 	glm::mat4 shipModelMatrix = glm::translate(cameraPos + cameraDir * 1.0f) * glm::mat4_cast(glm::inverse(rotation)) * shipInitialTransformation;
 	drawObjectColor(shipContext, shipModelMatrix, glm::vec3(0.6f));
 
-	drawObjectTexture(sphereContext, glm::translate(glm::vec3(0, 0, 0)), textureAsteroid);
-
 	drawObjectTexture(terrainContext, glm::translate(glm::vec3(0, -2, 0)) * glm::scale(glm::vec3(1.0f)), textureTerrain);
+
+	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(1, 2.5f, -4)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
+	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(1, 3, -2)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
+	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(1, 1.5f, 2)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
+	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(-3, 3.5f, 10)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
+	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(-5, 4.5f, 10)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
+	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(-8, 5.5f, 10)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
+	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(-10, 6.5f, 8)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
+	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(-12, 6.5f, 8)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
+	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(-15, 6.5f, 8)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-8, 5, 6)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-13, 5.3f, 3)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-13, 5.3f, 3)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-15, 6.5f, 7)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-18, 7.0f, -12)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-16, 7.0f, -10)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-0, 1, 6)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-2, 2.0f, 3)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(2, 2.0f, 3)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-4, 2.5f, 7)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-6, 2.0f, -12)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-1, 2.0f, -10)) * glm::scale(glm::vec3(0.5f)), textureAloe);
+
+
+	drawObjectTexture(seaweedContext, glm::translate(glm::vec3(-9, 5.8f, -15)) * glm::scale(glm::vec3(1.0f)), textureSeaweed);
+	drawObjectTexture(seaweedContext, glm::translate(glm::vec3(-11, 5.8f, -15)) * glm::scale(glm::vec3(1.0f)), textureSeaweed);
+	drawObjectTexture(seaweedContext, glm::translate(glm::vec3(-9, 5, -13)) * glm::scale(glm::vec3(1.0f)), textureSeaweed);
+	drawObjectTexture(seaweedContext, glm::translate(glm::vec3(-12, 5.8f, -13)) * glm::scale(glm::vec3(1.0f)), textureSeaweed);
+	drawObjectTexture(seaweedContext, glm::translate(glm::vec3(-16, 7.1f, -13)) * glm::scale(glm::vec3(1.0f)), textureSeaweed);
+	drawObjectTexture(seaweedContext, glm::translate(glm::vec3(-15, 7.1f, -12)) * glm::scale(glm::vec3(1.0f)), textureSeaweed);
 
 	glDepthFunc(GL_LESS); // set depth function back to default
 
 	// particles
 	handleAllParticleSources(cameraPos, programParticles, cameraSide, cameraVertical, cameraMatrix, perspectiveMatrix);
-
+	glm::vec3  transform1 = glm::vec3(0, 3, 0);
+	glm::vec3  transform2 = glm::vec3(0, 0, 3);
+	glm::vec3  transform3 = glm::vec3(3, 0, 0);
+	glm::vec3  transform4 = glm::vec3(0, 2, 1);
+	for (int i = 0; i < 30; i++) {
+		if (time > -10) {
+			glm::mat4 matrix = animationMatrix(time + 15, keyPoints1, keyRotation1);
+			drawObjectTexture(fishContext, matrix * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(transform1) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(transform2) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(transform3) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(transform4) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(glm::vec3(1, 3, 0)) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(glm::vec3(0.5f, 0.5f, 0)) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(glm::vec3(0, 1, 0.5f)) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(glm::vec3(0.8f, 1.2f, 0.5f)) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(glm::vec3(1, 3, 1)) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(glm::vec3(0.3f, 2, 0)) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(glm::vec3(0.1f, 1, 0.1f)) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			drawObjectTexture(fishContext, matrix * glm::translate(glm::vec3(0.6f, 2, 0.6f)) * glm::rotate(glm::radians(0.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(2.5f)), textureFish);
+			
+			matrix = animationMatrix(time + 15, keyPoints2, keyRotation2);
+			drawObjectTexture(fish2Context, matrix * glm::rotate(glm::radians(180.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(0.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(0.5f)), textureFish2);
+			drawObjectTexture(fish2Context, matrix * glm::translate(transform1) * glm::rotate(glm::radians(180.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(0.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(0.5f)), textureFish2);
+			drawObjectTexture(fish2Context, matrix * glm::translate(transform2) * glm::rotate(glm::radians(180.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(0.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(0.5f)), textureFish2);
+			drawObjectTexture(fish2Context, matrix * glm::translate(transform3) * glm::rotate(glm::radians(180.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(0.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(0.5f)), textureFish2);
+			drawObjectTexture(fish2Context, matrix * glm::translate(transform4) * glm::rotate(glm::radians(180.0f), glm::vec3(1, 0, 0)) * glm::rotate(glm::radians(0.0f), glm::vec3(0, 0, 1)) * glm::rotate(glm::radians(270.0f), glm::vec3(0, 0, 1)) * glm::scale(glm::vec3(0.5f)), textureFish2);
+			
+			time -= 3;
+		}
+	}
 	glUseProgram(0);
 	glutSwapBuffers();
 }
+
+void initKeyRoation(std::vector<glm::vec3>& keyPoints, std::vector<glm::quat>& keyRotation) {
+	glm::vec3 oldDirection = glm::vec3(0, 0, 1);
+	glm::quat oldRotationCamera = glm::quat(1, 0, 0, 0);
+	for (int i = 0; i < keyPoints.size() - 1; i++) {
+		glm::vec3 direction = glm::normalize(keyPoints[i + 1] - keyPoints[i]);
+		glm::quat rotation = normalize(glm::rotationCamera(oldDirection, direction) * oldRotationCamera);
+		keyRotation.push_back(rotation);
+		oldDirection = direction;
+		oldRotationCamera = rotation;
+	}
+	keyRotation.push_back(glm::quat(1, 0, 0, 0));
+}
+
 
 void init()
 {
@@ -299,10 +496,17 @@ void init()
 	programParticles = shaderLoader.CreateProgram("shaders/particles.vert", "shaders/particles.frag");
 
 	loadModelToContext("models/spaceship.obj", shipContext);
-	loadModelToContext("models/sphere.obj", sphereContext);
+	loadModelToContext("models/seaweed.obj", seaweedContext);
+	loadModelToContext("models/seaweed2.obj", seaweed2Context);
+	loadModelToContext("models/aloe.obj", aloeContext);
+	loadModelToContext("models/fish1.obj", fishContext);
 	loadModelToContext("models/ocean_floor3.obj", terrainContext);
+	loadModelToContext("models/fish2.obj", fish2Context);
 	textureTerrain = Core::LoadTexture("textures/ocean_floor.jpg");
-	textureAsteroid = Core::LoadTexture("textures/asteroid.png");
+	textureSeaweed = Core::LoadTexture("textures/seaweed.png");
+	textureAloe = Core::LoadTexture("textures/aloe.png");
+	textureFish = Core::LoadTexture("textures/fish1.png");
+	textureFish2 = Core::LoadTexture("textures/fish2.png");
 	cubemapTexture = loadCubemap();
 	createSkybox();
 
@@ -312,6 +516,9 @@ void init()
 	addParticleSource(glm::vec3(0, -2, 0), 100.0f, 1.5f);
 	addParticleSource(glm::vec3(0, -2, -3), 100.0f, 1.5f);
 	addParticleSource(glm::vec3(2, -2, -1), 100.0f, 1.5f);
+
+	initKeyRoation(keyPoints1, keyRotation1);
+	initKeyRoation(keyPoints2, keyRotation2);
 }
 
 void shutdown()

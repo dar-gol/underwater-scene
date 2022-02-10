@@ -3,11 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grk-cw2", "cw 2\grk-cw2.vcxproj", "{B4031E08-6274-4FFD-B41C-F8EA29E977FB}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grk-cw6", "cw 6\grk-cw6.vcxproj", "{10701B86-9B0B-46A1-85DA-6238CBCC507B}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grk-cw8", "cw 8\grk-cw8.vcxproj", "{4EE187F6-DEE7-4917-86D9-08C36D54920F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "main", "cw 6\grk-cw6.vcxproj", "{10701B86-9B0B-46A1-85DA-6238CBCC507B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,24 +13,12 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B4031E08-6274-4FFD-B41C-F8EA29E977FB}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B4031E08-6274-4FFD-B41C-F8EA29E977FB}.Debug|Win32.Build.0 = Debug|Win32
-		{B4031E08-6274-4FFD-B41C-F8EA29E977FB}.Debug|x64.ActiveCfg = Debug|Win32
-		{B4031E08-6274-4FFD-B41C-F8EA29E977FB}.Release|Win32.ActiveCfg = Release|Win32
-		{B4031E08-6274-4FFD-B41C-F8EA29E977FB}.Release|Win32.Build.0 = Release|Win32
-		{B4031E08-6274-4FFD-B41C-F8EA29E977FB}.Release|x64.ActiveCfg = Release|Win32
 		{10701B86-9B0B-46A1-85DA-6238CBCC507B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{10701B86-9B0B-46A1-85DA-6238CBCC507B}.Debug|Win32.Build.0 = Debug|Win32
 		{10701B86-9B0B-46A1-85DA-6238CBCC507B}.Debug|x64.ActiveCfg = Debug|Win32
 		{10701B86-9B0B-46A1-85DA-6238CBCC507B}.Release|Win32.ActiveCfg = Release|Win32
 		{10701B86-9B0B-46A1-85DA-6238CBCC507B}.Release|Win32.Build.0 = Release|Win32
 		{10701B86-9B0B-46A1-85DA-6238CBCC507B}.Release|x64.ActiveCfg = Release|Win32
-		{4EE187F6-DEE7-4917-86D9-08C36D54920F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4EE187F6-DEE7-4917-86D9-08C36D54920F}.Debug|Win32.Build.0 = Debug|Win32
-		{4EE187F6-DEE7-4917-86D9-08C36D54920F}.Debug|x64.ActiveCfg = Debug|Win32
-		{4EE187F6-DEE7-4917-86D9-08C36D54920F}.Release|Win32.ActiveCfg = Release|Win32
-		{4EE187F6-DEE7-4917-86D9-08C36D54920F}.Release|Win32.Build.0 = Release|Win32
-		{4EE187F6-DEE7-4917-86D9-08C36D54920F}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
