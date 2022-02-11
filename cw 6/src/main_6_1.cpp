@@ -19,7 +19,7 @@ GLuint programColor, programTexture, programSkybox, programParticles;
 
 Core::Shader_Loader shaderLoader;
 
-Core::RenderContext shipContext, terrainContext, seaweedContext, fishContext, seaweed2Context, aloeContext, fish2Context;
+Core::RenderContext shipContext, terrainContext, seaweedContext, fishContext, seaweed2Context, aloeContext, fish2Context, whaleContext;
 
 glm::vec3 cameraPos = glm::vec3(0, 5, 5);
 glm::vec3 cameraDir; // Wektor "do przodu" kamery
@@ -378,6 +378,7 @@ void createSkybox() {
 void renderScene()
 {
 	float time = glutGet(GLUT_ELAPSED_TIME) / 1000.f;
+	float pozZ = time * 2;
 	// Aktualizacja macierzy widoku i rzutowania
 	cameraMatrix = createCameraMatrix();
 	perspectiveMatrix = Core::createPerspectiveMatrix();
@@ -417,6 +418,10 @@ void renderScene()
 	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(-10, 6.5f, 8)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
 	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(-12, 6.5f, 8)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
 	drawObjectColor(seaweed2Context, glm::translate(glm::vec3(-15, 6.5f, 8)) * glm::scale(glm::vec3(1.5f)), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	drawObjectColor(whaleContext, glm::translate(glm::vec3(0, 50.0f, -50 + pozZ)) * glm::scale(glm::vec3(2.0f)), glm::vec3(0.5f, 0.5f, 0.5f));
+	drawObjectColor(whaleContext, glm::translate(glm::vec3(25, 50.0f, -60 + pozZ)) * glm::scale(glm::vec3(1.3f)), glm::vec3(0.5f, 0.5f, 0.5f));
+	drawObjectColor(whaleContext, glm::translate(glm::vec3(-35, 60.0f, -60 + pozZ)) * glm::scale(glm::vec3(1.0f)), glm::vec3(0.5f, 0.5f, 0.5f));
 
 	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-8, 5, 6)) * glm::scale(glm::vec3(0.5f)), textureAloe);
 	drawObjectTexture(aloeContext, glm::translate(glm::vec3(-13, 5.3f, 3)) * glm::scale(glm::vec3(0.5f)), textureAloe);
@@ -509,6 +514,7 @@ void init()
 	loadModelToContext("models/fish1.obj", fishContext);
 	loadModelToContext("models/ocean_floor3.obj", terrainContext);
 	loadModelToContext("models/fish2.obj", fish2Context);
+	loadModelToContext("models/Whale.obj", whaleContext);
 	textureTerrain = Core::LoadTexture("textures/ocean_floor.jpg");
 	textureSeaweed = Core::LoadTexture("textures/seaweed.png");
 	textureAloe = Core::LoadTexture("textures/aloe.png");
