@@ -7,6 +7,7 @@
 #include "freeglut.h"
 #include "glm.hpp"
 #include "../glm/gtx/norm.hpp"
+#include "Texture.h"
 
 #include <algorithm>
 #include <iostream>
@@ -188,7 +189,10 @@ GLuint loadDDS(const char* imagepath)
 }
 
 void initParticles() {
-	particleTexture = loadDDS("textures/particles/particle_original.DDS");
+	// old texture
+	// particleTexture = loadDDS("textures/particles/particle_original.DDS");
+
+	particleTexture = Core::LoadTexture("textures/particles/test_bubble.png");
 	
 	submarineSource.amount = 120.0f;
 	submarineSource.spread = 0.3f;
@@ -258,7 +262,7 @@ void spawnParticles(double deltaTime, glm::vec3 sourcePosition, double amount, f
 		ParticlesContainer[particleIndex].r = 200;
 		ParticlesContainer[particleIndex].g = 200;
 		ParticlesContainer[particleIndex].b = 255;
-		ParticlesContainer[particleIndex].a = (rand() % 256) / 3;
+		ParticlesContainer[particleIndex].a = 255;
 
 		float size = (rand() % 1000) / 100000.0f + 0.05f;
 		

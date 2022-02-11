@@ -248,8 +248,8 @@ void keyboard(unsigned char key, int x, int y)
 	if (isInBoundaries(nextPosition)) {
 		cameraPos = nextPosition;
 	}
-
-	std::cout << "X: " << cameraPos.x << " Y: " << cameraPos.y << " Z: " << cameraPos.z << std::endl;
+	
+	// std::cout << "X: " << cameraPos.x << " Y: " << cameraPos.y << " Z: " << cameraPos.z << std::endl;
 }
 
 void mouse(int x, int y)
