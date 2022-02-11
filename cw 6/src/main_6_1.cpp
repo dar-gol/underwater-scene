@@ -39,7 +39,7 @@ glm::mat4 cameraMatrix, perspectiveMatrix;
 
 glm::vec3 lightDir = glm::vec3(1.0f, -0.9f, -1.0f);
 
-GLuint textureSeaweed, textureTerrain, textureFish, textureSeaweed2, textureAloe, textureFish2;
+GLuint textureSeaweed, textureTerrain, textureFish, textureSeaweed2, textureAloe, textureFish2, textureShip;
 
 unsigned int cubemapTexture; //skybox
 unsigned int skyboxVAO, skyboxVBO; //skybox
@@ -190,7 +190,7 @@ float skyboxVertices[] = {
 
 bool isInBoundaries(glm::vec3 nextPosition) {
 	return nextPosition.z > -skyboxBoundary && nextPosition.z < skyboxBoundary 
-		&& nextPosition.y > 5.0f && nextPosition.y < skyboxBoundary
+		&& nextPosition.y > 1.0f && nextPosition.y < skyboxBoundary
 		&& nextPosition.x < skyboxBoundary && nextPosition.x > -skyboxBoundary;
 }
 
@@ -248,6 +248,8 @@ void keyboard(unsigned char key, int x, int y)
 	if (isInBoundaries(nextPosition)) {
 		cameraPos = nextPosition;
 	}
+
+	std::cout << "X: " << cameraPos.x << " Y: " << cameraPos.y << " Z: " << cameraPos.z << std::endl;
 }
 
 void mouse(int x, int y)
@@ -264,8 +266,8 @@ void mouse(int x, int y)
 
 glm::mat4 createCameraMatrix()
 {
-	glm::quat quatX = glm::angleAxis(differenceY * 0.01f, glm::vec3(1.0, 0.0, 0.0));
-	glm::quat quatY = glm::angleAxis(differenceX * 0.01f, glm::vec3(0.0, 1.0, 0.0));
+	glm::quat quatX = glm::angleAxis(differenceY * 0.025f, glm::vec3(1.0, 0.0, 0.0));
+	glm::quat quatY = glm::angleAxis(differenceX * 0.025f, glm::vec3(0.0, 1.0, 0.0));
 
 	rotation = glm::normalize(quatX * quatY * quatZ * rotation);
 
@@ -396,9 +398,13 @@ void renderScene()
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4 shipInitialTransformation = glm::translate(glm::vec3(0, -0.5f, 0)) * glm::rotate(glm::radians(180.0f), glm::vec3(0, 1, 0)) * glm::scale(glm::vec3(0.25f));
+	glm::mat4 shipInitialTransformation = glm::translate(glm::vec3(1.09f, -0.6f, -1.1f)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 1, 0)) * glm::scale(glm::vec3(0.018f));
+	glm::mat4 shipParticleSourceInititalTransformation = glm::translate(glm::vec3(0.0f, -0.55f, 0.25f)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 1, 0)) * glm::scale(glm::vec3(0.018f));
+
 	glm::mat4 shipModelMatrix = glm::translate(cameraPos + cameraDir * 1.0f) * glm::mat4_cast(glm::inverse(rotation)) * shipInitialTransformation;
-	drawObjectColor(shipContext, shipModelMatrix, glm::vec3(0.6f));
+	glm::mat4 shipParticleSourceMatrix = glm::translate(cameraPos + cameraDir * 1.0f) * glm::mat4_cast(glm::inverse(rotation)) * shipParticleSourceInititalTransformation;
+
+	drawObjectTexture(shipContext, shipModelMatrix, textureShip);
 
 	drawObjectTexture(terrainContext, glm::translate(glm::vec3(0, -2, 0)) * glm::scale(glm::vec3(1.0f)), textureTerrain);
 
@@ -436,7 +442,8 @@ void renderScene()
 	glDepthFunc(GL_LESS); // set depth function back to default
 
 	// particles
-	handleAllParticleSources(cameraPos, programParticles, cameraSide, cameraVertical, cameraMatrix, perspectiveMatrix);
+	handleAllParticleSources(cameraPos, cameraDir, shipParticleSourceMatrix, programParticles, cameraSide, cameraVertical, cameraMatrix, perspectiveMatrix);
+
 	glm::vec3  transform1 = glm::vec3(0, 3, 0);
 	glm::vec3  transform2 = glm::vec3(0, 0, 3);
 	glm::vec3  transform3 = glm::vec3(3, 0, 0);
@@ -495,7 +502,7 @@ void init()
 	programSkybox = shaderLoader.CreateProgram("shaders/skybox.vert","shaders/skybox.frag");
 	programParticles = shaderLoader.CreateProgram("shaders/particles.vert", "shaders/particles.frag");
 
-	loadModelToContext("models/spaceship.obj", shipContext);
+	loadModelToContext("models/untitled.obj", shipContext);
 	loadModelToContext("models/seaweed.obj", seaweedContext);
 	loadModelToContext("models/seaweed2.obj", seaweed2Context);
 	loadModelToContext("models/aloe.obj", aloeContext);
@@ -507,12 +514,19 @@ void init()
 	textureAloe = Core::LoadTexture("textures/aloe.png");
 	textureFish = Core::LoadTexture("textures/fish1.png");
 	textureFish2 = Core::LoadTexture("textures/fish2.png");
+	textureShip = Core::LoadTexture("textures/sub.png");
 	cubemapTexture = loadCubemap();
 	createSkybox();
 
 	initParticles();
 	addParticleSource(glm::vec3(3.45, -1.9, 1.45), 120.0f, 0.6f);
 	addParticleSource(glm::vec3(-1.6, 1, 1.6), 180.0f, 0.3f);
+	addParticleSource(glm::vec3(8, 3, 8), 110.0f, 0.3f);
+	addParticleSource(glm::vec3(-6.1, 4, 10.5), 110.0f, 0.7f);
+	addParticleSource(glm::vec3(-11, 3, 0), 140.0f, 1.0f);
+	addParticleSource(glm::vec3(6.7, -3, -8), 140.0f, 1.0f);
+
+	
 	addParticleSource(glm::vec3(0, -2, 0), 100.0f, 1.5f);
 	addParticleSource(glm::vec3(0, -2, -3), 100.0f, 1.5f);
 	addParticleSource(glm::vec3(2, -2, -1), 100.0f, 1.5f);
@@ -540,9 +554,9 @@ int main(int argc, char ** argv)
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowPosition(200, 200);
-	glutInitWindowSize(600, 600);
-	glutCreateWindow("OpenGL Pierwszy Program");
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(700, 700);
+	glutCreateWindow("Underwater Scene");
 	glewInit();
 
 	init();

@@ -30,9 +30,12 @@ struct ParticleSource {
 };
 
 std::vector<ParticleSource> particleSources;
+ParticleSource submarineSource;
+glm::vec3 lastSubmarineSourcePos = glm::vec3(0.0f);
 
 int ParticlesCount = 0;
 double lastTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
+float engineDelay = 0.0f;
 
 // CPU representation of a particle
 struct Particle {
@@ -85,6 +88,12 @@ int FindUnusedParticle() {
 
 void SortParticles() {
 	std::sort(&ParticlesContainer[0], &ParticlesContainer[MaxParticles]);
+}
+
+bool isPositionEqual(glm::vec3 a, glm::vec3 b) {
+	return (abs(a.x - b.x) < 0.05 
+		&& abs(a.y - b.y) < 0.05 
+		&& abs(a.z - b.z) < 0.05);
 }
 
 GLuint loadDDS(const char* imagepath)
@@ -180,6 +189,9 @@ GLuint loadDDS(const char* imagepath)
 
 void initParticles() {
 	particleTexture = loadDDS("textures/particles/particle_original.DDS");
+	
+	submarineSource.amount = 120.0f;
+	submarineSource.spread = 0.3f;
 
 	g_particule_position_size_data = new GLfloat[MaxParticles * 4];
 	g_particule_color_data = new GLubyte[MaxParticles * 4];
@@ -215,7 +227,7 @@ void initParticles() {
 	glBufferData(GL_ARRAY_BUFFER, MaxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
 }
 
-void spawnParticles(double deltaTime, glm::vec3 sourcePosition, double amount, float spread) {
+void spawnParticles(double deltaTime, glm::vec3 sourcePosition, double amount, float spread, bool submarineSource) {
 
 	// Generate 10 new particule each millisecond,
 	// but limit this to 16 ms (60 fps), or if you have 1 long frame (1sec),
@@ -243,13 +255,21 @@ void spawnParticles(double deltaTime, glm::vec3 sourcePosition, double amount, f
 		ParticlesContainer[particleIndex].speed = maindir + randomdir * spread;
 
 
-		// Very bad way to generate a random color
 		ParticlesContainer[particleIndex].r = 200;
 		ParticlesContainer[particleIndex].g = 200;
 		ParticlesContainer[particleIndex].b = 255;
 		ParticlesContainer[particleIndex].a = (rand() % 256) / 3;
 
-		ParticlesContainer[particleIndex].size = (rand() % 1000) / 100000.0f + 0.05f;
+		float size = (rand() % 1000) / 100000.0f + 0.05f;
+		
+		if (submarineSource) {
+			ParticlesContainer[particleIndex].size = size / 3;
+			if (rand() % 2 < 1) ParticlesContainer[particleIndex].life = 0;
+		}
+		else {
+			ParticlesContainer[particleIndex].size = size;
+		}
+
 
 	}
 }
@@ -405,15 +425,34 @@ void renderParticles() {
 	glDisableVertexAttribArray(2);
 }
 
-void handleAllParticleSources(glm::vec3 cameraPos, GLuint programParticles, glm::vec3 cameraSide, glm::vec3 cameraVertical, glm::mat4 cameraMatrix, glm::mat4 perspectiveMatrix)  {
+void handleAllParticleSources(glm::vec3 cameraPos, glm::vec3 cameraDir, glm::mat4 shipModelMatrix, GLuint programParticles, glm::vec3 cameraSide, glm::vec3 cameraVertical, glm::mat4 cameraMatrix, glm::mat4 perspectiveMatrix) {
 	double currentTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
 	double delta = currentTime - lastTime;
 	lastTime = currentTime;
 
 	for (ParticleSource particleSource : particleSources)
 	{
-		spawnParticles(delta, particleSource.pos, particleSource.amount, particleSource.spread);
+		spawnParticles(delta, particleSource.pos, particleSource.amount, particleSource.spread, false);
 	}
+
+	glm::vec3 newSubmarineSourcePos = glm::vec3(shipModelMatrix[3][0], shipModelMatrix[3][1], shipModelMatrix[3][2]);
+
+	if (!isPositionEqual(newSubmarineSourcePos, lastSubmarineSourcePos)) {
+		submarineSource.pos = newSubmarineSourcePos;
+		// std::cout << "X: " << submarineSource.pos.x << " Y: " << submarineSource.pos.y << " Z: " << submarineSource.pos.z << std::endl;
+
+		spawnParticles(delta, submarineSource.pos, submarineSource.amount, submarineSource.spread, true);
+		engineDelay = 0.5f;
+	}
+	else {
+		engineDelay -= delta;
+		// std::cout << "Delay: " << engineDelay << std::endl;
+		if (engineDelay > 0) {
+			spawnParticles(delta, submarineSource.pos, submarineSource.amount, submarineSource.spread, true);
+		}
+	}
+
+	lastSubmarineSourcePos = submarineSource.pos;
 	
 	simulateParticles(cameraPos, delta);
 	updateParticles();
@@ -427,3 +466,4 @@ void shutdownParticles() {
 	glDeleteBuffers(1, &particles_position_buffer);
 	glDeleteBuffers(1, &billboard_vertex_buffer);
 }
+
